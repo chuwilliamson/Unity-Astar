@@ -9,25 +9,43 @@ public class ScriptableNode : ScriptableObject
     public int V;
 
     public int G;
-    public int H;
-    public int _f;
-    public int F
-    {
-        get
-        {
-            _f = G + H;
-            return G + H;
-        }
-    }
+    public int H;    
+    public int F;
+ 
 
     public ScriptableNode Parent;
     public List<ScriptableNode> Neighbors;
+    public enum NodeState
+    {
+        None = 0,
+        Open = 1,
+        Closed = 2,        
+    }
 
-    public bool Walkable { get; set; }
+    public void ChangeState(NodeState state)
+    {
+        CurrentState = state;
+    }
+    public NodeState CurrentState;
+    private bool walkable;
+    public bool Walkable
+    {
+        get
+        {
+            return walkable;
+        }
+        set
+        {
+            walkable = value;
+            ChangeState(NodeState.Closed);
+        }
+    }
     public void Create(AstarNode n)
     {
         Parent = null;
         Neighbors = new List<ScriptableNode>();
+        CurrentState = NodeState.None;
+        Walkable = true;
         G = n.G;
         H = n.H;
         U = n.U;

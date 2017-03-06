@@ -44,5 +44,12 @@ namespace AIE
             float y = Mathf.Abs(dest.V - src.V);
             return ((int)x + (int)y) * 10;
         }
+
+        public static int ManhattanDistance(int u1, int v1, int u2, int v2)
+        {
+            int x = Mathf.Abs(u2 - u1);
+            int y = Mathf.Abs(v2 - v1);
+            return (x + y) * 10;
+        }
     }
 }

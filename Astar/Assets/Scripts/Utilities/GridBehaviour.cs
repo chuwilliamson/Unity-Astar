@@ -13,24 +13,18 @@ public class GridBehaviour : MonoBehaviour
     /// The nodes
     /// </summary>
     public List<ScriptableNode> Nodes;
+    public GameObject prefab;
     public int Rows = 5;
     public int Cols = 5;
+    public float Scale = 5;
+    public float Offset = 5;
     public void Awake()
     {
         Nodes.ForEach(n => n.Walkable = true);
         Current = Nodes[0];
         Goal = Nodes[99];
     }
-    public GameObject GetChild(ScriptableNode s)
-    {
-        if(Children[s.Id].GetComponent<NodeBehaviour>().Node != s)
-        {
-            Debug.LogError("node behaviour node mismatch");
-            return null;
-        }
-        return Children[s.Id];
-    }
-
+ 
     /*
         1. Find node closest to your position and declare it start node and put it on 
             the open list. 
@@ -58,57 +52,88 @@ public class GridBehaviour : MonoBehaviour
 
     public ScriptableNode Goal;
     public ScriptableNode Current;
+    public ScriptableNode Start;
 
     public List<ScriptableNode> Open = new List<ScriptableNode>();
     public List<ScriptableNode> Closed = new List<ScriptableNode>();
-
+    public List<ScriptableNode> Path = new List<ScriptableNode>();
     public IEnumerator Astar(ScriptableNode start, ScriptableNode goal)
     {       
         Current = start;
+        Start = start;
         AddToOpen(Current);
         while(Open.Count > 0)
         {
             Open.Sort((a, b) => a.F.CompareTo(b.F));
             Current = Open[0];
             AddToClosed(Current);
-            yield return new WaitForSeconds(.1f);
+            if(Closed.Contains(goal))
+            {
+                StopAllCoroutines();
+                break;
+            }
+           
+            
+          
             foreach(var n in Current.Neighbors)
             {
-                if(!Open.Contains(n) && n.Walkable)
-                {
-                    AddToOpen(n);
-                    n.G = (int)Vector3.Distance(GetChild(n).transform.position, GetChild(Current).transform.position);
-                    n.H = Utilities.ManhattanDistance(new Point(n.U, n.V), new Point(goal.U, goal.V));
-                    n.Parent = Current;
-                }
-                else if(Open.Contains(n))
-                {                    
-                    AddToClosed(n);
-                    if(n.G < Current.G)
+                n.H = Utilities.ManhattanDistance(n.U, n.V, goal.U, goal.V);
+                
+                if(!Closed.Contains(n) && n.Walkable)
+                {                                        
+                    if(!Open.Contains(n))
                     {
-                        n.Parent = Current;
+                        AddToOpen(n);
                         n.G = (int)Vector3.Distance(GetChild(n).transform.position, GetChild(Current).transform.position);
+                        n.F = n.G + n.H; ;
+                        n.Parent = Current;
                         Open.Sort((a, b) => a.F.CompareTo(b.F));
+                    }
+                    else if(Open.Contains(n))
+                    {   
+                        int move = (int)Vector3.Distance(GetChild(n).transform.position, GetChild(Current).transform.position);
+                        if(move + Current.G < n.G)
+                        {
+                            n.Parent = Current;                   
+                            n.G = move + Current.G;                            
+                            n.F = n.G + n.H; ;
+                            Open.Sort((a, b) => a.F.CompareTo(b.F));
+
+                        }
                     }
                 }
             }
-            if(Closed.Contains(goal))
-                break;
+            
             yield return null;
         }
+        RetracePath(goal);
     }
-        
+     
+    public void RetracePath(ScriptableNode s)
+    {
+        var iterator = s;
+        while(iterator != Start)
+        {
+            Path.Add(iterator);
+            iterator = iterator.Parent;            
+        }
+        Path.ForEach(n => SetColor(GetChild(n), Color.yellow));
+    }
     public void AddToOpen(ScriptableNode s)
     {
-        Open.Add(s);
+        Open.Add(s);        
+        GetChild(s).GetComponent<NodeBehaviour>().Tween();
         GetChild(s).GetComponent<MeshRenderer>().material.color = Color.cyan;
+        GetChild(s).transform.SetParent(GameObject.Find("Open").transform);
     }
-
+    
     public void AddToClosed(ScriptableNode s)
     {
         Open.Remove(s);
         Closed.Add(s);
-        GetChild(s).GetComponent<MeshRenderer>().material.color = Color.black;
+        GetChild(s).GetComponent<NodeBehaviour>().Tween();
+        GetChild(s).GetComponent<MeshRenderer>().material.color = Color.magenta;
+        GetChild(s).transform.SetParent(GameObject.Find("Closed").transform);
 
     }
 
@@ -117,15 +142,36 @@ public class GridBehaviour : MonoBehaviour
         Clear();
         Open.Clear();
         Closed.Clear();
+        Path.Clear();
         Goal = s;
+        Goal.Walkable = true;
         SetColor(GetChild(Goal), Color.green);
+        Nodes.ForEach(n => n.H = Utilities.ManhattanDistance(n.U, n.V, Goal.U, Goal.V));
+        Nodes.ForEach(n => n.ChangeState(ScriptableNode.NodeState.None));
+        StopAllCoroutines();
         StartCoroutine(Astar(Current, Goal));
     }
-
+ 
     public void SetStart(ScriptableNode s)
     {
+        Clear();
+        Open.Clear();
+        Closed.Clear();
+        Path.Clear();
+        s.Walkable = true;
+        SetColor(GetChild(s), Color.green);
         Current = s;
     }
+    public GameObject GetChild(ScriptableNode s)
+    {
+        if(Children[s.Id].GetComponent<NodeBehaviour>().Node != s)
+        {
+            Debug.LogError("node behaviour node mismatch");
+            return null;
+        }
+        return Children[s.Id];
+    }
+
     [ContextMenu("Create Nodes")]
     public void CreateNodes()
     {
@@ -143,19 +189,21 @@ public class GridBehaviour : MonoBehaviour
         }
 
         Nodes.ForEach(n => n.Neighbors = Neighbors(n));
-        CreateGameObjects();
-
+        Nodes.ForEach(n => n.Walkable = true);
+        Current = Nodes[0];
+        Goal = Nodes[99];
+        CreateGameObjects(); 
     }
+
     public void Clear()
     {
         Children.ForEach(child => SetColor(child, Color.white));
         foreach(var n in Nodes)
         {
             if(!n.Walkable)
-                SetColor(GetChild(n), Color.red);
+                SetColor(GetChild(n), Color.red);           
         }
-        
-            
+
         Nodes.ForEach(node => node.Parent = null);
     }
 
@@ -183,12 +231,19 @@ public class GridBehaviour : MonoBehaviour
     {
         foreach(var n in Nodes)
         {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            GameObject go;
+            if(prefab == null)
+                go = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            else
+                go = Instantiate(prefab);
             go.transform.SetParent(transform);
-            go.transform.localPosition = new Vector3(n.U * 10, n.V * 10);
-            go.transform.localScale = new Vector3(5, 5, 5);
+            go.transform.localPosition = new Vector3(n.U * Offset, n.V * Offset);
+            go.transform.localScale *= Scale;
             go.name = string.Format("Node {0}", n.Id);
-            var nb = go.AddComponent<NodeBehaviour>();
+            
+            var nb = go.GetComponent<NodeBehaviour>();
+            if(nb == null)
+                nb = go.AddComponent<NodeBehaviour>();
             nb.Node = n;
             nb.grid = this;
             Children.Add(go);

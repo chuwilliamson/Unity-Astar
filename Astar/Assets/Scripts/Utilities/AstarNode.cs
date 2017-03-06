@@ -23,10 +23,16 @@ using AIE;
 /// </summary>
 namespace AIE
 {
+    public enum NodeState
+    {
+        None,
+        Open,
+        Closed,
+    }
     [Serializable]
     public class AstarNode
     {
-
+        
         public AstarNode(int u, int v, int id)
         {
             G = 0;
