@@ -12,7 +12,6 @@ public class GridMatchBehaviour : MonoBehaviour, IGridBehaviour
     public float Scale;
     public List<GameObject> Children;
     public List<ScriptableNode> Nodes;
-    public ScriptableGrid scriptableGrid;
     public GameObject prefab;
     public ScriptableNode Current;
     public ScriptableNode Goal;
@@ -82,14 +81,14 @@ public class GridMatchBehaviour : MonoBehaviour, IGridBehaviour
             Nodes.Add(node);
         }
 
-        Nodes.ForEach(n => n.Neighbors = Neighbors(n));
+        Nodes.ForEach(n => n.Neighbors = GetNeighbors(n));
         Nodes.ForEach(n => n.Walkable = true);
         Current = Nodes[0];
         Goal = Nodes[Nodes.Count - 1];
-        CreateGameObjects();
+        CreateChildren();
     }
 
-    public void CreateGameObjects()
+    public void CreateChildren()
     {
         foreach(var n in Nodes)
         {
@@ -109,7 +108,7 @@ public class GridMatchBehaviour : MonoBehaviour, IGridBehaviour
         }
     }
 
-    public List<ScriptableNode> Neighbors(ScriptableNode node)
+    public List<ScriptableNode> GetNeighbors(ScriptableNode node)
     {
         var neighbors = new List<ScriptableNode>();
         var dirs = new List<Point>()
