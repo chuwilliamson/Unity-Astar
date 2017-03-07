@@ -44,10 +44,10 @@ public class AstarEditor : EditorWindow
 
     public void GetNeighbors()
     {
-        var node = scriptableGrid.GetNode(new Point((int)nPos.x, (int)nPos.y));
-        var nay = scriptableGrid.GetNeighbors(node.Id);
-        foreach(var n in nay)
-            Debug.Log(n);
+        //var node = scriptableGrid.GetNode(new Point((int)nPos.x, (int)nPos.y));
+        //var nay = scriptableGrid.GetNeighbors(node.Id);
+        //foreach(var n in nay)
+        //    Debug.Log(n);
     }
     public static void ClearGrid()
     {
@@ -63,22 +63,7 @@ public class AstarEditor : EditorWindow
     public void CreateGrid()
     {
         ClearGrid();
-        var grid = new AstarGrid((int)dims.x, (int)dims.y);
-        var parent = new GameObject("Grid", typeof(GridBehaviour));
-        var children = new List<GameObject>();        
-
-        foreach(var node in grid.Nodes)
-        {
-            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);            
-            go.transform.SetParent(parent.transform);
-            go.name = string.Format("Node {0}", node.Id);
-            go.transform.position = new Vector3(10 * node.U, 0, 10 * node.V);
-            go.AddComponent<NodeBehaviour>();  
-            children.Add(go);
-            EditorUtility.SetDirty(go);
-        }
- 
-        EditorUtility.SetDirty(parent);
+        scriptableGrid = (ScriptableGrid)CreateInstance(typeof(ScriptableGrid));
     }
     public static void CreateScriptables(AstarGrid g)
     {

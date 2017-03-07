@@ -6,21 +6,22 @@ using UnityEngine.EventSystems;
 
 public class NodeBehaviour : MonoBehaviour, IPointerClickHandler , IPointerEnterHandler
 {
+    public int f, g, h;
     public List<GameObject> Neighbors;    
     public ScriptableNode Node;
-    public GridBehaviour grid;
-    public Vector3 scale;
+    public IGridBehaviour gridBehaviour;
+    public float scaleFactor = 1.25f;
+    private Vector3 scale;
  
     private void Start()
-    {
- 
+    { 
         scale = transform.localScale;
         Neighbors = new List<GameObject>();
-        Node.Neighbors.ForEach(n => Neighbors.Add(grid.GetChild(n)));
+        Node.Neighbors.ForEach(n => Neighbors.Add(gridBehaviour.GetChild(n)));
         if(Block)
             Node.Walkable = false;
         if(!Node.Walkable)
-            grid.SetColor(Node, Color.red);        
+            gridBehaviour.SetColor(Node, Color.red);        
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -28,11 +29,11 @@ public class NodeBehaviour : MonoBehaviour, IPointerClickHandler , IPointerEnter
         if(eventData.button == PointerEventData.InputButton.Left)
         {
             eventData.selectedObject = gameObject;
-            grid.SetGoal(Node);
+            gridBehaviour.SetGoal(Node);
         }
         if(eventData.button == PointerEventData.InputButton.Right)
         {            
-            grid.SetStart(Node);
+            gridBehaviour.SetStart(Node);
         }
         eventData.Use();
     }
@@ -41,7 +42,7 @@ public class NodeBehaviour : MonoBehaviour, IPointerClickHandler , IPointerEnter
     private void Update()
     {     
         if(Node.Parent)
-            Debug.DrawLine(transform.position, grid.GetChild(Node.Parent).transform.position);
+            Debug.DrawLine(transform.position, gridBehaviour.GetChild(Node.Parent).transform.position);
         f = Node.F;
         g = Node.G;
         h = Node.H;
@@ -53,9 +54,9 @@ public class NodeBehaviour : MonoBehaviour, IPointerClickHandler , IPointerEnter
         {
             Node.Walkable = !Node.Walkable;
             if(!Node.Walkable)
-                grid.SetColor(Node, Color.red);
+                gridBehaviour.SetColor(Node, Color.red);
             else
-                grid.SetColor(Node, Color.white);
+                gridBehaviour.SetColor(Node, Color.white);
           
             StartCoroutine("TweenScale");           
         }
@@ -74,7 +75,7 @@ public class NodeBehaviour : MonoBehaviour, IPointerClickHandler , IPointerEnter
         
         while(timer < .5f)
         {            
-            transform.localScale = Vector3.Lerp(oldScale, oldScale * 1.25f, timer /1f);
+            transform.localScale = Vector3.Lerp(oldScale, oldScale * scaleFactor, timer /1f);
             timer += Time.deltaTime;
             yield return null;
         }
@@ -82,7 +83,7 @@ public class NodeBehaviour : MonoBehaviour, IPointerClickHandler , IPointerEnter
         yield return null;
     }
 
-    public int f, g, h;
+  
 }
 
 

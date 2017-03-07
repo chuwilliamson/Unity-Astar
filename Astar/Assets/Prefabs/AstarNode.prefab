@@ -50,8 +50,8 @@ MeshRenderer:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1800649788358386}
   m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -109,7 +109,7 @@ MonoBehaviour:
   Neighbors: []
   Node: {fileID: 0}
   grid: {fileID: 0}
-  scale: {x: 0, y: 0, z: 0}
+  scaleFactor: 1.25
   Block: 0
   f: 0
   g: 0
