@@ -65,11 +65,7 @@ public class AstarEditor : EditorWindow
         ClearGrid();
         scriptableGrid = (ScriptableGrid)CreateInstance(typeof(ScriptableGrid));
     }
-    public static void CreateScriptables(AstarGrid g)
-    {
  
-
-    }
     public static void DeleteScriptables()
     {
        

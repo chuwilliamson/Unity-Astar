@@ -62,7 +62,7 @@ public class GridBehaviour : MonoBehaviour, IGridBehaviour
         SetColor(GetChild(start), Color.green);
         Source = start;
     }
-
+#region Astar
     public IEnumerator Astar(ScriptableNode start, ScriptableNode goal, List<ScriptableNode> cameFrom)
     {
         Timer = 0;
@@ -135,6 +135,7 @@ public class GridBehaviour : MonoBehaviour, IGridBehaviour
         int cost = (current.U == neighbor.U || current.V == neighbor.V) ? 10 : 14;
         return cost;
     }
+#endregion Astar
 
     public GameObject GetChild(ScriptableNode s)
     {     
