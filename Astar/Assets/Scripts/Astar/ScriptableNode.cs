@@ -12,10 +12,12 @@ public class ScriptableNode : ScriptableObject
     public bool Walkable;
 
     public ScriptableNode Parent;
+
     public List<ScriptableNode> Neighbors;
 
-    public void Create(AstarNode n)
+    public void Initialize(AstarNode n)
     {
+        
         Parent = null;
         Neighbors = new List<ScriptableNode>();
         Walkable = true;
@@ -24,5 +26,6 @@ public class ScriptableNode : ScriptableObject
         U = n.U;
         V = n.V;
         Id = n.Id;
+        
     } 
 }

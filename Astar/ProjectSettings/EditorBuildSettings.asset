@@ -6,4 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/0.Managers.unity
+  - enabled: 1
     path: Assets/Scenes/1.Astar.unity
+  - enabled: 1
+    path: Assets/Scenes/2.Office.unity
+  - enabled: 1
+    path: Assets/Scenes/3.Library.unity
+  - enabled: 1
+    path: Assets/Scenes/4.EndCredits.unity

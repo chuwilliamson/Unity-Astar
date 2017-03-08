@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AIE;
 public class GridBehaviour : MonoBehaviour, IGridBehaviour
-{
+{    
     private void Awake()
     {      
         Children.ForEach(child => child.GetComponent<NodeBehaviour>().gridBehaviour = this);
@@ -197,7 +197,7 @@ public class GridBehaviour : MonoBehaviour, IGridBehaviour
         foreach(var p in positions)
         {
             var node = ScriptableObject.CreateInstance<ScriptableNode>();
-            node.Create(new AstarNode(p.U, p.V, Nodes.Count));
+            node.Initialize(new AstarNode(p.U, p.V, Nodes.Count));
             node.name = string.Format("Node {0}", Nodes.Count.ToString());
             Nodes.Add(node);
         }

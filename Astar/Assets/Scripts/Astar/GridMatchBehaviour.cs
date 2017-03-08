@@ -76,7 +76,7 @@ public class GridMatchBehaviour : MonoBehaviour, IGridBehaviour
         foreach(var p in positions)
         {
             var node = ScriptableObject.CreateInstance<ScriptableNode>();
-            node.Create(new AstarNode(p.U, p.V, Nodes.Count));
+            node.Initialize(new AstarNode(p.U, p.V, Nodes.Count));
             node.name = string.Format("Node {0}", Nodes.Count.ToString());
             Nodes.Add(node);
         }
