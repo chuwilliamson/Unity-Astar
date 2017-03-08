@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AIE;
 public class GridBehaviour : MonoBehaviour, IGridBehaviour
-{
+{    
     private void Awake()
     {      
         Children.ForEach(child => child.GetComponent<NodeBehaviour>().gridBehaviour = this);
@@ -62,7 +62,7 @@ public class GridBehaviour : MonoBehaviour, IGridBehaviour
         SetColor(GetChild(start), Color.green);
         Source = start;
     }
-
+#region Astar
     public IEnumerator Astar(ScriptableNode start, ScriptableNode goal, List<ScriptableNode> cameFrom)
     {
         Timer = 0;
@@ -135,6 +135,7 @@ public class GridBehaviour : MonoBehaviour, IGridBehaviour
         int cost = (current.U == neighbor.U || current.V == neighbor.V) ? 10 : 14;
         return cost;
     }
+#endregion Astar
 
     public GameObject GetChild(ScriptableNode s)
     {     
@@ -196,7 +197,7 @@ public class GridBehaviour : MonoBehaviour, IGridBehaviour
         foreach(var p in positions)
         {
             var node = ScriptableObject.CreateInstance<ScriptableNode>();
-            node.Create(new AstarNode(p.U, p.V, Nodes.Count));
+            node.Initialize(new AstarNode(p.U, p.V, Nodes.Count));
             node.name = string.Format("Node {0}", Nodes.Count.ToString());
             Nodes.Add(node);
         }
